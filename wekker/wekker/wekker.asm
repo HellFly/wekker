@@ -1,12 +1,21 @@
 	.include "m32def.inc"
 
-	; Registers for the counters
+	; Registers for the counters for the time
 	.def hour_ten = R2
 	.def hour_one = R3
 	.def minute_ten = R4
 	.def minute_one = R5
 	.def second_ten = R6
 	.def second_one = R7
+	; Registers for the counters for the alarm
+	.def alarm_hour_ten = R8
+	.def alarm_hour_one = R9
+	.def alarm_minute_ten = R10
+	.def alarm_minute_one = R11
+	.def ten_compare = R12
+	.def seven_compare = R13
+	.def two_compare = R14
+	.def four_compare = R15
 
 	.def tmp = R16
 	.def arg = R17
@@ -18,9 +27,6 @@
 
 	.equ LCD = PORTD
 	.equ DDR_LCD = DDRD
-
-	.equ led = PORTB			; Define the output LEDS
-	.equ led_setup = DDRB
 
 	.equ button = PINA			; Define the input buttons
 	.equ button_setup = DDRA
@@ -47,6 +53,16 @@ init:
 
 	RCALL INIT_RS232 ; Initialize the connection with the PC
 	RCALL INIT_TIMER ; Initialize the timer interrupt
+
+	; Initialize the compare registers
+	LDI tmp, 10
+	MOV ten_compare, tmp
+	LDI tmp, 7
+	MOV seven_compare, tmp
+	LDI tmp, 2
+	MOV two_compare, tmp
+	LDI tmp, 4
+	MOV four_compare, tmp
 	RCALL init_lcd
 
 	RJMP main
@@ -56,7 +72,38 @@ main:
 	RJMP main
 
 TIMER_INTERRUPT:
-	
+	INC second_one ; A second has passed
+	CP second_one, ten_compare
+	BRNE END_OF_INTERRUPT
+	CLR second_one	; Set second_one to zero again
+	INC second_ten ; Ten seconds have passed
+	CP second_ten, seven_compare
+	BRNE END_OF_INTERRUPT
+	CLR second_ten	; Set second_ten to zero again
+	INC minute_one ; A minute has passed
+	CP minute_one, ten_compare
+	BRNE END_OF_INTERRUPT
+	CLR minute_one	; Set minute_one to zero again
+	INC minute_ten ; Ten minutes have passed
+	CP minute_ten, seven_compare
+	BRNE END_OF_INTERRUPT
+	CLR minute_ten	; Set minute_ten to zero again
+	INC hour_one ; An hour has passed
+	; Check whether 24 hours has been reached
+	CP hour_one, four_compare
+	BRNE CONTINUE
+	CP hour_ten, 
+	; 24 not reached, continue
+	CONTINUE:
+	CP hour_one, ten_compare
+	BRNE END_OF_INTERRUPT
+	CLR hour_one	; Set hour_one to zero again
+	INC hour_ten	; Ten hours have passed
+
+	24_REACHED:
+
+
+	END_OF_INTERRUPT:
 	RETI
 
 ; Initialize the connection with the PC
