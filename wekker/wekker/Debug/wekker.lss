@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.52  C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm Wed Apr 02 14:57:10 2014
+AVRASM ver. 2.1.52  C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm Wed Apr 02 16:01:31 2014
 
 [builtin](2): Including file 'C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.39.1005\avrassembler\Include\m32def.inc'
 C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm(1): Including file 'C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.39.1005\avrassembler\Include\m32def.inc'
@@ -864,6 +864,14 @@ C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm(1): Including f
                  #endif  /* _M32DEF_INC_ */
                  
                  
+                 	; Registers for the counters
+                 	.def hour_ten = R2
+                 	.def hour_one = R3
+                 	.def minute_ten = R4
+                 	.def minute_one = R5
+                 	.def second_ten = R6
+                 	.def second_one = R7
+                 
                  	.def tmp = R16
                  	.def arg = R17
                  	.def counter1 = r18
@@ -881,114 +889,224 @@ C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm(1): Including f
                  	.equ button = PINA			; Define the input buttons
                  	.equ button_setup = DDRA
                  
-000000 c000      	RJMP init
+000000 c00e      	RJMP init
+                 	
+                 	.org OC1Aaddr
+00000e c03a      	rjmp TIMER_INTERRUPT ; adres ISR (Timer1 Output Compare Match)		
                  
                  init:
                  	; init stackpointer
-000001 e50f      	LDI tmp, LOW(RAMEND)
-000002 bf0d       	OUT SPL, tmp
-000003 e008       	LDI tmp, HIGH(RAMEND)
-000004 bf0e       	OUT SPH, tmp
+00000f e50f      	LDI tmp, LOW(RAMEND)
+000010 bf0d       	OUT SPL, tmp
+000011 e008       	LDI tmp, HIGH(RAMEND)
+000012 bf0e       	OUT SPH, tmp
                  
-000005 ef0f      	LDI tmp, 0xFF				; Define the value for the output
-000006 bb07      	OUT led_setup, tmp			; Define the LEDs as output
-000007 ef0f      	LDI tmp, 0xFF
-000008 bb08      	OUT led, tmp
+000013 ef0f      	LDI tmp, 0xFF				; Define the value for the output
+000014 bb07      	OUT led_setup, tmp			; Define the LEDs as output
+000015 ef0f      	LDI tmp, 0xFF
+000016 bb08      	OUT led, tmp
                  
-000009 e000      	LDI tmp, 0x00				; Define the value for the output
-00000a bb0a      	OUT button_setup, tmp		; Define the buttons as input
+000017 e000      	LDI tmp, 0x00				; Define the value for the output
+000018 bb0a      	OUT button_setup, tmp		; Define the buttons as input
                  
-00000b d002      	RCALL init_lcd
+000019 d030      	RCALL INIT_RS232 ; Initialize the connection with the PC
+00001a d038      	RCALL INIT_TIMER ; Initialize the timer interrupt
+00001b d041      	RCALL init_lcd
                  
-00000c c000      	RJMP loop
+00001c c000      	RJMP main
                  
-                 loop:
+                 main:
+00001d d001      	RCALL send_time
+00001e cffe      	RJMP main
+                 
+                 send_time:
+00001f e3e8      	LDI ZL, low(numbers*2)
+000020 e0f1      	LDI ZH, high(numbers*2)
+000021 2d02      	MOV tmp, hour_ten
+000022 0fe0      	ADD ZL, tmp
+000023 9114      	LPM arg, Z
+000024 d021      	RCALL send_byte
+                 
+000025 e3e8      	LDI ZL, low(numbers*2)
+000026 e0f1      	LDI ZH, high(numbers*2)
+000027 2d03      	MOV tmp, hour_one
+000028 0fe0      	ADD ZL, tmp
+000029 9114      	LPM arg, Z
+00002a d01b      	RCALL send_byte
+                 
+00002b e3e8      	LDI ZL, low(numbers*2)
+00002c e0f1      	LDI ZH, high(numbers*2)
+00002d 2d04      	MOV tmp, minute_ten
+00002e 0fe0      	ADD ZL, tmp
+00002f 9114      	LPM arg, Z
+000030 d015      	RCALL send_byte
+                 
+000031 e3e8      	LDI ZL, low(numbers*2)
+000032 e0f1      	LDI ZH, high(numbers*2)
+000033 2d05      	MOV tmp, minute_one
+000034 0fe0      	ADD ZL, tmp
+000035 9114      	LPM arg, Z
+000036 d00f      	RCALL send_byte
+                 
+000037 e3e8      	LDI ZL, low(numbers*2)
+000038 e0f1      	LDI ZH, high(numbers*2)
+000039 2d06      	MOV tmp, second_ten
+00003a 0fe0      	ADD ZL, tmp
+00003b 9114      	LPM arg, Z
+00003c d009      	RCALL send_byte
+                 
+00003d e3e8      	LDI ZL, low(numbers*2)
+00003e e0f1      	LDI ZH, high(numbers*2)
+00003f 2d07      	MOV tmp, second_one
+000040 0fe0      	ADD ZL, tmp
+000041 9114      	LPM arg, Z
+000042 d003      	RCALL send_byte
+                 
+000043 e016      	LDI arg, 0b00000110
+000044 d001      	RCALL send_byte
+                 
+000045 9508      	RET
+                 
+                 send_byte:
+000046 b91c      	OUT UDR, arg
+000047 d04d      	RCALL delay_some_ms
+000048 9508      	RET
+                 
+                 TIMER_INTERRUPT:
                  	
-00000d cfff      	RJMP loop
+000049 9518      	RETI
                  
+                 ; Initialize the connection with the PC
+                 INIT_RS232:
+                 	; set the baud rate, see datahseet p.167
+                 	; F_OSC = 11.0592 MHz & baud rate = 19200
+                 	; to do a 16-bit write, the high byte must be written before the low byte !
+                 	; for a 16-bit read, the low byte must be read before the high byte !
+00004a e000      	ldi tmp, high(35)
+00004b bd00      	out UBRRH, tmp
+00004c e203      	ldi tmp, low(35) ; 19200 baud
+00004d b909      	out UBRRL, tmp
+                 
+                 	; set frame format : asynchronous, parity disabled, 8 data bits, 1 stop bit
+00004e e806      	ldi tmp, (1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0)
+00004f bd00      	out UCSRC, tmp
+                 	; enable receiver & transmitter
+000050 e108      	ldi tmp, (1 << RXEN) | (1 << TXEN)
+000051 b90a      	out UCSRB, tmp
+000052 9508      	RET
+                 
+                 ; Initialize the timer
+                 INIT_TIMER:
+                 	; init Output Compare Register
+                 	; f kristal = 11059200 en 1 sec = (256/11059200) * 43200
+                 	; to do a 16 - bit write, the high byte must be written before the low byte !
+                 	; for a 16 - bit read, the low byte must be read before the high byte !
+                 	; (p 89 datasheet)
+000053 ea08      	ldi tmp, high(43200)
+000054 bd0b      	out OCR1AH, tmp
+000055 ec00      	ldi tmp, low(43200)
+000056 bd0a      	out OCR1AL, tmp
+                 	; zet prescaler op 256 & zet timer in CTC - mode
+000057 e00c      	ldi tmp, (1 << CS12) | (1 << WGM12)
+000058 bd0e      	out TCCR1B, tmp
+                 	; enable interrupt
+000059 e100      	ldi tmp, (1 << OCIE1A)
+00005a bf09      	out TIMSK, tmp
+00005b 9478      	sei ; enable alle interrupts
+00005c 9508      	RET
+                 
+                 //LCD stuff
                  init_lcd:
-00000e d009      	rcall init_4bitmode
-00000f e218      	ldi arg, 0x28		; 0010 1000 2 lines, 5x8 font, 4-bit mode see p 24/25 datasheet
-000010 d014      	rcall send_ins
-000011 e01e      	ldi arg, 0x0E		; 0000 1110 display on, cursor on, no blinking see p 24/25 datasheet
-000012 d012      	rcall send_ins
-000013 e011      	ldi arg, 0x01		; 0000 0001 clear display, set cursor home, adres counter = 0
-000014 d010      	rcall send_ins
-000015 e016      	ldi arg, 0x06		; 0000 0110 auto-increment cursor
-000016 d00e      	rcall send_ins
-000017 9508      	ret
+00005d d009      	rcall init_4bitmode
+00005e e218      	ldi arg, 0x28		; 0010 1000 2 lines, 5x8 font, 4-bit mode see p 24/25 datasheet
+00005f d014      	rcall send_ins
+000060 e01e      	ldi arg, 0x0E		; 0000 1110 display on, cursor on, no blinking see p 24/25 datasheet
+000061 d012      	rcall send_ins
+000062 e011      	ldi arg, 0x01		; 0000 0001 clear display, set cursor home, adres counter = 0
+000063 d010      	rcall send_ins
+000064 e016      	ldi arg, 0x06		; 0000 0110 auto-increment cursor
+000065 d00e      	rcall send_ins
+000066 9508      	ret
                  
                  init_4bitmode:
-000018 e310      	ldi arg, 0x30
-000019 d025      	rcall clock_in
-00001a d02b      	rcall delay_some_ms
-00001b e310      	ldi arg, 0x30
-00001c d022      	rcall clock_in
-00001d d028      	rcall delay_some_ms
-00001e e310      	ldi arg, 0x30
-00001f d01f      	rcall clock_in
-000020 d025      	rcall delay_some_ms
-000021 e210      	ldi arg, 0x20
-000022 d01c      	rcall clock_in
-000023 d022      	rcall delay_some_ms
-000024 9508      	ret
+000067 e310      	ldi arg, 0x30
+000068 d025      	rcall clock_in
+000069 d02b      	rcall delay_some_ms
+00006a e310      	ldi arg, 0x30
+00006b d022      	rcall clock_in
+00006c d028      	rcall delay_some_ms
+00006d e310      	ldi arg, 0x30
+00006e d01f      	rcall clock_in
+00006f d025      	rcall delay_some_ms
+000070 e210      	ldi arg, 0x20
+000071 d01c      	rcall clock_in
+000072 d022      	rcall delay_some_ms
+000073 9508      	ret
                  
                  send_ins:
-000025 931f      	push arg
+000074 931f      	push arg
                  	; first 4 higher bits
-000026 7f10      	andi arg, 0xf0
-000027 d017      	rcall clock_in
+000075 7f10      	andi arg, 0xf0
+000076 d017      	rcall clock_in
                  	; then 4 lower bits
-000028 911f      	pop arg
-000029 9512      	swap arg
-00002a 7f10      	andi arg, 0xf0
-00002b d013      	rcall clock_in
-00002c d019      	rcall delay_some_ms
-00002d 9508      	ret
+000077 911f      	pop arg
+000078 9512      	swap arg
+000079 7f10      	andi arg, 0xf0
+00007a d013      	rcall clock_in
+00007b d019      	rcall delay_some_ms
+00007c 9508      	ret
                  
                  send_str:
-00002e 9115      	LPM arg, Z+
-00002f 3f1f      	CPI arg, 0xFF
-000030 f011      	BREQ send_str_end
-000031 d002      	RCALL show_char
-000032 cffb      	RJMP send_str
+00007d 9115      	LPM arg, Z+
+00007e 3f1f      	CPI arg, 0xFF
+00007f f011      	BREQ send_str_end
+000080 d002      	RCALL show_char
+000081 cffb      	RJMP send_str
                  	send_str_end:
-000033 9508      		RET
+000082 9508      		RET
                  
                  show_char:
-000034 931f      	push arg
+000083 931f      	push arg
                  	; first 4 higher bits
-000035 7f10      	andi arg, 0xf0
-000036 6018      	ORI arg, 0b00001000	; Set the RS bit high
-000037 d007      	rcall clock_in
+000084 7f10      	andi arg, 0xf0
+000085 6018      	ORI arg, 0b00001000	; Set the RS bit high
+000086 d007      	rcall clock_in
                  	; then 4 lower bits
-000038 911f      	pop arg
-000039 9512      	swap arg
-00003a 7f10      	andi arg, 0xf0
-00003b 6018      	ORI arg, 0b00001000	; Set the RS bit high
-00003c d002      	rcall clock_in
-00003d d008      	rcall delay_some_ms
-00003e 9508      	ret
+000087 911f      	pop arg
+000088 9512      	swap arg
+000089 7f10      	andi arg, 0xf0
+00008a 6018      	ORI arg, 0b00001000	; Set the RS bit high
+00008b d002      	rcall clock_in
+00008c d008      	rcall delay_some_ms
+00008d 9508      	ret
                  
                  clock_in:
-00003f bb12      	OUT LCD, arg
-000040 6014      	ORI arg, 0b00000100
-000041 bb12      	out LCD, arg
-000042 7f1b      	ANDI arg, 0b11111011
-000043 bb12      	out LCD, arg
-000044 d001      	rcall delay_some_ms
-000045 9508      	ret
+00008e bb12      	OUT LCD, arg
+00008f 6014      	ORI arg, 0b00000100
+000090 bb12      	out LCD, arg
+000091 7f1b      	ANDI arg, 0b11111011
+000092 bb12      	out LCD, arg
+000093 d001      	rcall delay_some_ms
+000094 9508      	ret
                  
                  ; 65000 steps & CPU 11 Mhz gives delay of appr. 6 ms
                  delay_some_ms:
-000046 e02c      	ldi counter1, 12
+000095 e02c      	ldi counter1, 12
                  delay_1:
-000047 2733      	clr counter2
+000096 2733      	clr counter2
                  delay_2:
-000048 953a      	dec counter2
-000049 f7f1      	brne delay_2
-00004a 952a      	dec counter1
-00004b f7d9      	brne delay_1
+000097 953a      	dec counter2
+000098 f7f1      	brne delay_2
+000099 952a      	dec counter1
+00009a f7d9      	brne delay_1
+00009b 9508      	ret
+                 
+                 numbers:
+00009c 2477
+00009d 6d5d
+00009e 6a2e
+00009f 257b
+0000a0 6f7f      	.db 0b01110111, 0b00100100, 0b01011101, 0b01101101, 0b00101110, 0b01101010, 0b01111011, 0b00100101, 0b01111111, 0b01101111
 
 
 RESOURCE USE INFORMATION
@@ -1006,15 +1124,15 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega32" register use summary:
-r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
+r0 :   0 r1 :   0 r2 :   1 r3 :   1 r4 :   1 r5 :   1 r6 :   1 r7 :   1 
 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:   0 r14:   0 r15:   0 
-r16:  10 r17:  27 r18:   2 r19:   2 r20:   0 r21:   0 r22:   0 r23:   0 
-r24:   0 r25:   0 r26:   0 r27:   0 r28:   0 r29:   0 r30:   0 r31:   0 
-x  :   0 y  :   0 z  :   1 
-Registers used: 5 out of 35 (14.3%)
+r16:  38 r17:  35 r18:   2 r19:   2 r20:   0 r21:   0 r22:   0 r23:   0 
+r24:   0 r25:   0 r26:   0 r27:   0 r28:   0 r29:   0 r30:  12 r31:   6 
+x  :   0 y  :   0 z  :   7 
+Registers used: 13 out of 35 (37.1%)
 
 "ATmega32" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
+.lds  :   0 .sts  :   0 adc   :   0 add   :   6 adiw  :   0 and   :   0 
 andi  :   5 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
 brcc  :   0 brcs  :   0 break :   0 breq  :   1 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
@@ -1024,21 +1142,21 @@ clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :   1 cls   :   0
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 
 cpi   :   1 cpse  :   0 dec   :   2 eor   :   0 fmul  :   0 fmuls :   0 
 fmulsu:   0 icall :   0 ijmp  :   0 in    :   0 inc   :   0 jmp   :   0 
-ld    :   0 ldd   :   0 ldi   :  14 lds   :   0 lpm   :   1 lsl   :   0 
-lsr   :   0 mov   :   0 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
-neg   :   0 nop   :   0 or    :   0 ori   :   3 out   :   8 pop   :   2 
-push  :   2 rcall :  22 ret   :   7 reti  :   0 rjmp  :   4 rol   :   0 
+ld    :   0 ldd   :   0 ldi   :  35 lds   :   0 lpm   :  13 lsl   :   0 
+lsr   :   0 mov   :   6 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
+neg   :   0 nop   :   0 or    :   0 ori   :   3 out   :  17 pop   :   2 
+push  :   2 rcall :  33 ret   :  11 reti  :   1 rjmp  :   5 rol   :   0 
 ror   :   0 sbc   :   0 sbci  :   0 sbi   :   0 sbic  :   0 sbis  :   0 
 sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 
-sei   :   0 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
+sei   :   1 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
 sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :   0 
 sub   :   0 subi  :   0 swap  :   2 tst   :   0 wdr   :   0 
-Instructions used: 16 out of 113 (14.2%)
+Instructions used: 20 out of 113 (17.7%)
 
 "ATmega32" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x00009a    154      0    154   32768   0.5%
+[.cseg] 0x000000 0x000142    286     10    296   32768   0.9%
 [.dseg] 0x000060 0x000060      0      0      0    2048   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 

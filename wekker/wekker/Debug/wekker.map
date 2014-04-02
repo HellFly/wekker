@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.52  C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm Wed Apr 02 14:57:10 2014
+AVRASM ver. 2.1.52  C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm Wed Apr 02 16:01:31 2014
 
 
 EQU  SIGNATURE_000 0000001e
@@ -568,6 +568,12 @@ EQU  ACIaddr      00000024
 EQU  TWIaddr      00000026
 EQU  SPMRaddr     00000028
 EQU  INT_VECTORS_SIZE 0000002a
+DEF  hour_ten     r2
+DEF  hour_one     r3
+DEF  minute_ten   r4
+DEF  minute_one   r5
+DEF  second_ten   r6
+DEF  second_one   r7
 DEF  tmp          r16
 DEF  arg          r17
 DEF  counter1     r18
@@ -580,15 +586,21 @@ EQU  led          00000018
 EQU  led_setup    00000017
 EQU  button       00000019
 EQU  button_setup 0000001a
-CSEG init         00000001
-CSEG init_lcd     0000000e
-CSEG loop         0000000d
-CSEG init_4bitmode 00000018
-CSEG send_ins     00000025
-CSEG clock_in     0000003f
-CSEG delay_some_ms 00000046
-CSEG send_str     0000002e
-CSEG send_str_end 00000033
-CSEG show_char    00000034
-CSEG delay_1      00000047
-CSEG delay_2      00000048
+CSEG init         0000000f
+CSEG TIMER_INTERRUPT 00000049
+CSEG INIT_RS232   0000004a
+CSEG INIT_TIMER   00000053
+CSEG init_lcd     0000005d
+CSEG main         0000001d
+CSEG send_time    0000001f
+CSEG numbers      0000009c
+CSEG send_byte    00000046
+CSEG delay_some_ms 00000095
+CSEG init_4bitmode 00000067
+CSEG send_ins     00000074
+CSEG clock_in     0000008e
+CSEG send_str     0000007d
+CSEG send_str_end 00000082
+CSEG show_char    00000083
+CSEG delay_1      00000096
+CSEG delay_2      00000097

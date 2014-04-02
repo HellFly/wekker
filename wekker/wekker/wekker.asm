@@ -52,8 +52,61 @@ init:
 	RJMP main
 
 main:
-	
+	RCALL send_time
 	RJMP main
+
+send_time:
+	LDI ZL, low(numbers*2)
+	LDI ZH, high(numbers*2)
+	MOV tmp, hour_ten
+	ADD ZL, tmp
+	LPM arg, Z
+	RCALL send_byte
+
+	LDI ZL, low(numbers*2)
+	LDI ZH, high(numbers*2)
+	MOV tmp, hour_one
+	ADD ZL, tmp
+	LPM arg, Z
+	RCALL send_byte
+
+	LDI ZL, low(numbers*2)
+	LDI ZH, high(numbers*2)
+	MOV tmp, minute_ten
+	ADD ZL, tmp
+	LPM arg, Z
+	RCALL send_byte
+
+	LDI ZL, low(numbers*2)
+	LDI ZH, high(numbers*2)
+	MOV tmp, minute_one
+	ADD ZL, tmp
+	LPM arg, Z
+	RCALL send_byte
+
+	LDI ZL, low(numbers*2)
+	LDI ZH, high(numbers*2)
+	MOV tmp, second_ten
+	ADD ZL, tmp
+	LPM arg, Z
+	RCALL send_byte
+
+	LDI ZL, low(numbers*2)
+	LDI ZH, high(numbers*2)
+	MOV tmp, second_one
+	ADD ZL, tmp
+	LPM arg, Z
+	RCALL send_byte
+
+	LDI arg, 0b00000110
+	RCALL send_byte
+
+	RET
+
+send_byte:
+	OUT UDR, arg
+	RCALL delay_some_ms
+	RET
 
 TIMER_INTERRUPT:
 	
@@ -184,3 +237,6 @@ delay_2:
 	brne delay_1
 	ret
 
+numbers:
+	.db 0b01110111, 0b00100100, 0b01011101, 0b01101101, 0b00101110, 0b01101010, 0b01111011, 0b00100101, 0b01111111, 0b01101111
+;		0			1			2			3			4			5			6			7			8			9
