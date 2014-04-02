@@ -1,0 +1,37 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.1.52</VERSION>
+ <DEVICE>"ATmega32"</DEVICE>
+ <WORKING_DIR>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.39.1005\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.39.1005\avrassembler\Include\m32def.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\Debug/wekker.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>wekker.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>wekker.map</FILE>
+  <FILE>wekker.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <init><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>22</LINE></init>
+  <init_lcd><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>45</LINE></init_lcd>
+  <loop><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>41</LINE></loop>
+  <init_4bitmode><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>57</LINE></init_4bitmode>
+  <send_ins><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>72</LINE></send_ins>
+  <clock_in><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>109</LINE></clock_in>
+  <delay_some_ms><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>119</LINE></delay_some_ms>
+  <send_str><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>85</LINE></send_str>
+  <send_str_end><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>91</LINE></send_str_end>
+  <show_char><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>94</LINE></show_char>
+  <delay_1><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>121</LINE></delay_1>
+  <delay_2><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>123</LINE></delay_2>
+ </LABELS>
+</ASSEMBLER_INFO>
