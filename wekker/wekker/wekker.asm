@@ -31,16 +31,25 @@ init:
 	LDI tmp, 0xFF
 	OUT led, tmp
 
+	; set the baud rate, see datahseet p.167
+	; F_OSC = 11.0592 MHz & baud rate = 19200
+	; to do a 16-bit write, the high byte must be written before the low byte !
+	; for a 16-bit read, the low byte must be read before the high byte !
+	ldi tmp, high(35)
+	out UBRRH, tmp
+	ldi tmp, low(35) ; 19200 baud
+	out UBRRL, tmp
+
 	LDI tmp, 0x00				; Define the value for the output
 	OUT button_setup, tmp		; Define the buttons as input
 
 	RCALL init_lcd
 
-	RJMP loop
+	RJMP main
 
-loop:
+main:
 	
-	RJMP loop
+	RJMP main
 
 init_lcd:
 	rcall init_4bitmode
