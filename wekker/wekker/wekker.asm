@@ -40,6 +40,13 @@ init:
 	ldi tmp, low(35) ; 19200 baud
 	out UBRRL, tmp
 
+	; set frame format : asynchronous, parity disabled, 8 data bits, 1 stop bit
+	ldi tmp, (1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0)
+	out UCSRC, tmp
+	; enable receiver & transmitter
+	ldi tmp, (1 << RXEN) | (1 << TXEN)
+	out UCSRB, tmp
+
 	LDI tmp, 0x00				; Define the value for the output
 	OUT button_setup, tmp		; Define the buttons as input
 
