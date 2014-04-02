@@ -31,6 +31,9 @@ init:
 	LDI tmp, 0xFF
 	OUT led, tmp
 
+	LDI tmp, 0x00				; Define the value for the output
+	OUT button_setup, tmp		; Define the buttons as input
+
 	; set the baud rate, see datahseet p.167
 	; F_OSC = 11.0592 MHz & baud rate = 19200
 	; to do a 16-bit write, the high byte must be written before the low byte !
@@ -46,9 +49,6 @@ init:
 	; enable receiver & transmitter
 	ldi tmp, (1 << RXEN) | (1 << TXEN)
 	out UCSRB, tmp
-
-	LDI tmp, 0x00				; Define the value for the output
-	OUT button_setup, tmp		; Define the buttons as input
 
 	RCALL init_lcd
 
