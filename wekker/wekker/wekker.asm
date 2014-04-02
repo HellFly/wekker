@@ -1,5 +1,13 @@
 	.include "m32def.inc"
 
+	; Registers for the counters
+	.def hour_ten = R2
+	.def hour_one = R3
+	.def minute_ten = R4
+	.def minute_one = R5
+	.def second_ten = R6
+	.def second_one = R7
+
 	.def tmp = R16
 	.def arg = R17
 	.def counter1 = r18
@@ -18,6 +26,9 @@
 	.equ button_setup = DDRA
 
 	RJMP init
+	
+	.org OC1Aaddr
+	rjmp TIMER_INTERRUPT ; adres ISR (Timer1 Output Compare Match)		
 
 init:
 	; init stackpointer
@@ -34,6 +45,22 @@ init:
 	LDI tmp, 0x00				; Define the value for the output
 	OUT button_setup, tmp		; Define the buttons as input
 
+	RCALL INIT_RS232 ; Initialize the connection with the PC
+	RCALL INIT_TIMER ; Initialize the timer interrupt
+	RCALL init_lcd
+
+	RJMP main
+
+main:
+	
+	RJMP main
+
+TIMER_INTERRUPT:
+	
+	RETI
+
+; Initialize the connection with the PC
+INIT_RS232:
 	; set the baud rate, see datahseet p.167
 	; F_OSC = 11.0592 MHz & baud rate = 19200
 	; to do a 16-bit write, the high byte must be written before the low byte !
@@ -49,15 +76,29 @@ init:
 	; enable receiver & transmitter
 	ldi tmp, (1 << RXEN) | (1 << TXEN)
 	out UCSRB, tmp
+	RET
 
-	RCALL init_lcd
+; Initialize the timer
+INIT_TIMER:
+	; init Output Compare Register
+	; f kristal = 11059200 en 1 sec = (256/11059200) * 43200
+	; to do a 16 - bit write, the high byte must be written before the low byte !
+	; for a 16 - bit read, the low byte must be read before the high byte !
+	; (p 89 datasheet)
+	ldi tmp, high(43200)
+	out OCR1AH, tmp
+	ldi tmp, low(43200)
+	out OCR1AL, tmp
+	; zet prescaler op 256 & zet timer in CTC - mode
+	ldi tmp, (1 << CS12) | (1 << WGM12)
+	out TCCR1B, tmp
+	; enable interrupt
+	ldi tmp, (1 << OCIE1A)
+	out TIMSK, tmp
+	sei ; enable alle interrupts
+	RET
 
-	RJMP main
-
-main:
-	
-	RJMP main
-
+//LCD stuff
 init_lcd:
 	rcall init_4bitmode
 	ldi arg, 0x28		; 0010 1000 2 lines, 5x8 font, 4-bit mode see p 24/25 datasheet
@@ -142,3 +183,4 @@ delay_2:
 	dec counter1
 	brne delay_1
 	ret
+
