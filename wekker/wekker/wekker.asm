@@ -45,9 +45,9 @@ init:
  	OUT SPH, tmp
 
 	LDI tmp, 0xFF				; Define the value for the output
-	OUT led_setup, tmp			; Define the LEDs as output
+	;OUT led_setup, tmp			; Define the LEDs as output
 	LDI tmp, 0xFF
-	OUT led, tmp
+	;OUT led, tmp
 
 	LDI tmp, 0x00				; Define the value for the output
 	OUT button_setup, tmp		; Define the buttons as input
@@ -147,22 +147,23 @@ TIMER_INTERRUPT:
 	CP hour_one, four_compare
 	BRNE CONTINUE
 	CP hour_ten, two_compare
-	BREQ 24_REACHED
+	BREQ END_OF_DAY_REACHED
 	; 24 not reached, hour_one can increase, continue
 	CONTINUE:
 	CP hour_one, ten_compare
 	BRNE END_OF_INTERRUPT
 	CLR hour_one	; Set hour_one to zero again
 	INC hour_ten	; Ten hours have passed
-	RETI	; End
+	RJMP END_OF_INTERRUPT	; End
 
 	; 24 hours reached, set it to zero
-	24_REACHED:
+	END_OF_DAY_REACHED:
 	CLR hour_ten
 	CLR hour_one
 
 	; Jump here to end the interrupt when needed
 	END_OF_INTERRUPT:
+	RCALL send_time
 	RETI
 
 ; Initialize the connection with the PC
