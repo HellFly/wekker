@@ -31,6 +31,18 @@
 	rjmp TIMER_INTERRUPT ; adres ISR (Timer1 Output Compare Match)		
 
 init:
+	LDI tmp, 0
+	MOV hour_ten, tmp
+	LDI tmp, 1
+	MOV hour_one, tmp
+	LDI tmp, 2
+	MOV minute_ten, tmp
+	LDI tmp, 3
+	MOV minute_one, tmp
+	LDI tmp, 4
+	MOV second_ten, tmp
+	LDI tmp, 5
+	MOV second_one, tmp
 	; init stackpointer
 	LDI tmp, LOW(RAMEND)
  	OUT SPL, tmp
@@ -48,11 +60,28 @@ init:
 	RCALL INIT_RS232 ; Initialize the connection with the PC
 	RCALL INIT_TIMER ; Initialize the timer interrupt
 	RCALL init_lcd
-
+	
 	RJMP main
 
 main:
 	RCALL send_time
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
+	RCALL delay_some_ms
 	RJMP main
 
 send_time:

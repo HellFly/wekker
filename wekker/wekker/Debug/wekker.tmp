@@ -22,22 +22,22 @@
  </OUTPUT_FILES>
  <LABELS>
   <init><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>33</LINE></init>
-  <TIMER_INTERRUPT><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>111</LINE></TIMER_INTERRUPT>
-  <INIT_RS232><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>116</LINE></INIT_RS232>
-  <INIT_TIMER><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>135</LINE></INIT_TIMER>
-  <init_lcd><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>155</LINE></init_lcd>
-  <main><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>54</LINE></main>
-  <send_time><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>58</LINE></send_time>
-  <numbers><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>240</LINE></numbers>
-  <send_byte><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>106</LINE></send_byte>
-  <delay_some_ms><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>229</LINE></delay_some_ms>
-  <init_4bitmode><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>167</LINE></init_4bitmode>
-  <send_ins><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>182</LINE></send_ins>
-  <clock_in><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>219</LINE></clock_in>
-  <send_str><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>195</LINE></send_str>
-  <send_str_end><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>201</LINE></send_str_end>
-  <show_char><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>204</LINE></show_char>
-  <delay_1><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>231</LINE></delay_1>
-  <delay_2><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>233</LINE></delay_2>
+  <TIMER_INTERRUPT><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>154</LINE></TIMER_INTERRUPT>
+  <INIT_RS232><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>159</LINE></INIT_RS232>
+  <INIT_TIMER><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>178</LINE></INIT_TIMER>
+  <init_lcd><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>198</LINE></init_lcd>
+  <main><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>66</LINE></main>
+  <send_time><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>101</LINE></send_time>
+  <delay_some_ms><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>272</LINE></delay_some_ms>
+  <numbers><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>283</LINE></numbers>
+  <send_byte><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>149</LINE></send_byte>
+  <init_4bitmode><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>210</LINE></init_4bitmode>
+  <send_ins><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>225</LINE></send_ins>
+  <clock_in><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>262</LINE></clock_in>
+  <send_str><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>238</LINE></send_str>
+  <send_str_end><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>244</LINE></send_str_end>
+  <show_char><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>247</LINE></show_char>
+  <delay_1><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>274</LINE></delay_1>
+  <delay_2><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>276</LINE></delay_2>
  </LABELS>
 </ASSEMBLER_INFO>
