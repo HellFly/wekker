@@ -92,17 +92,22 @@ TIMER_INTERRUPT:
 	; Check whether 24 hours has been reached
 	CP hour_one, four_compare
 	BRNE CONTINUE
-	CP hour_ten, 
-	; 24 not reached, continue
+	CP hour_ten, two_compare
+	BREQ 24_REACHED
+	; 24 not reached, hour_one can increase, continue
 	CONTINUE:
 	CP hour_one, ten_compare
 	BRNE END_OF_INTERRUPT
 	CLR hour_one	; Set hour_one to zero again
 	INC hour_ten	; Ten hours have passed
+	RETI	; End
 
+	; 24 hours reached, set it to zero
 	24_REACHED:
+	CLR hour_ten
+	CLR hour_one
 
-
+	; Jump here to end the interrupt when needed
 	END_OF_INTERRUPT:
 	RETI
 
