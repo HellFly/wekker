@@ -115,7 +115,7 @@ send_time:
 	LPM arg, Z
 	RCALL send_byte
 
-	LDI arg, 0b00000110
+	LDI arg, 0b00000010		; Only the last semi-colon is on
 	RCALL send_byte
 
 	RET
