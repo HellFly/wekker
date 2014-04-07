@@ -21,26 +21,20 @@
   <FILE>wekker.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <init><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>40</LINE></init>
-  <TIMER_INTERRUPT><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>128</LINE></TIMER_INTERRUPT>
-  <INIT_RS232><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>170</LINE></INIT_RS232>
-  <INIT_TIMER><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>189</LINE></INIT_TIMER>
-  <init_lcd><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>209</LINE></init_lcd>
-  <main><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>71</LINE></main>
-  <send_time><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>75</LINE></send_time>
-  <numbers><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>294</LINE></numbers>
-  <send_byte><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>123</LINE></send_byte>
-  <delay_some_ms><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>283</LINE></delay_some_ms>
-  <END_OF_INTERRUPT><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>165</LINE></END_OF_INTERRUPT>
-  <CONTINUE><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>152</LINE></CONTINUE>
-  <END_OF_DAY_REACHED><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>160</LINE></END_OF_DAY_REACHED>
-  <init_4bitmode><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>221</LINE></init_4bitmode>
-  <send_ins><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>236</LINE></send_ins>
-  <clock_in><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>273</LINE></clock_in>
-  <send_str><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>249</LINE></send_str>
-  <send_str_end><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>255</LINE></send_str_end>
-  <show_char><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>258</LINE></show_char>
-  <delay_1><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>285</LINE></delay_1>
-  <delay_2><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>287</LINE></delay_2>
+  <init><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>34</LINE></init>
+  <TIMER_INTERRUPT><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>154</LINE></TIMER_INTERRUPT>
+  <INIT_RS232><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>199</LINE></INIT_RS232>
+  <INIT_TIMER><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>218</LINE></INIT_TIMER>
+  <main><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>87</LINE></main>
+  <send_time><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>92</LINE></send_time>
+  <numbers><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>248</LINE></numbers>
+  <send_byte><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>147</LINE></send_byte>
+  <waiting_loop><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>149</LINE></waiting_loop>
+  <END_OF_INTERRUPT><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>194</LINE></END_OF_INTERRUPT>
+  <CONTINUE><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>181</LINE></CONTINUE>
+  <END_OF_DAY_REACHED><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>189</LINE></END_OF_DAY_REACHED>
+  <delay_some_ms><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>237</LINE></delay_some_ms>
+  <delay_1><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>239</LINE></delay_1>
+  <delay_2><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>241</LINE></delay_2>
  </LABELS>
 </ASSEMBLER_INFO>

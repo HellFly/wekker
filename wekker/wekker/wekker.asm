@@ -14,7 +14,7 @@
 	.def alarm_minute_one = R11
 	; Register to use for comparing
 	.def ten_compare = R12
-	.def seven_compare = R13
+	.def six_compare = R13
 	.def two_compare = R14
 	.def four_compare = R15
 
@@ -23,19 +23,13 @@
 	.def counter1 = r18
 	.def counter2 = r19
 
-	.equ LCD_RS = 3
-	.equ LCD_E = 2
-
-	.equ LCD = PORTD
-	.equ DDR_LCD = DDRD
-
 	.equ button = PINA			; Define the input buttons
 	.equ button_setup = DDRA
 
 	RJMP init
 	
 	.org OC1Aaddr
-	rjmp TIMER_INTERRUPT ; adres ISR (Timer1 Output Compare Match)		
+	RJMP TIMER_INTERRUPT ; adres ISR (Timer1 Output Compare Match)		
 
 init:
 	; init stackpointer
@@ -43,11 +37,6 @@ init:
  	OUT SPL, tmp
  	LDI tmp, HIGH(RAMEND)
  	OUT SPH, tmp
-
-	LDI tmp, 0xFF				; Define the value for the output
-	;OUT led_setup, tmp			; Define the LEDs as output
-	LDI tmp, 0xFF
-	;OUT led, tmp
 
 	LDI tmp, 0x00				; Define the value for the output
 	OUT button_setup, tmp		; Define the buttons as input
@@ -58,18 +47,46 @@ init:
 	; Initialize the compare registers
 	LDI tmp, 10
 	MOV ten_compare, tmp
-	LDI tmp, 7
-	MOV seven_compare, tmp
+	LDI tmp, 6
+	MOV six_compare, tmp
 	LDI tmp, 2
 	MOV two_compare, tmp
 	LDI tmp, 4
 	MOV four_compare, tmp
-	RCALL init_lcd
+
+	; Make sure the registers are clear
+	CLR second_one
+	CLR second_ten
+	CLR minute_one
+	CLR minute_ten
+	CLR hour_one
+	CLR hour_ten
+	CLR alarm_minute_one
+	CLR alarm_minute_ten
+	CLR alarm_hour_one
+	CLR alarm_hour_ten
+
+	LDI tmp, 0xFF
+	OUT DDRB, tmp
+	OUT PORTB, tmp
+
+	/*LDI arg, 0x00
+	RCALL send_byte
+	test_loop:
+	IN tmp, UDR
+	CPI tmp, 0x02
+	BRNE test_loop
+	LDI tmp, 0x00
+	OUT PORTB, tmp*/
+
+	LDI tmp, 0x81
+	OUT UDR, tmp
 
 	RJMP main
 
 main:
-	RCALL send_time
+	;RCALL TIMER_INTERRUPT
+
 	RJMP main
 
 send_time:
@@ -79,7 +96,7 @@ send_time:
 	ADD ZL, tmp
 	LPM arg, Z
 	RCALL send_byte
-
+	
 	LDI ZL, low(numbers*2)
 	LDI ZH, high(numbers*2)
 	MOV tmp, hour_one
@@ -115,23 +132,35 @@ send_time:
 	LPM arg, Z
 	RCALL send_byte
 
-	LDI arg, 0b00000010		; Only the last semi-colon is on
+	LDI arg, 0b00000010		; Only the last colon is on
 	RCALL send_byte
+
+	/*wait_seven_bytes_loop:
+	IN tmp, UDR
+	COM R20
+	OUT PORTB, R20
+	CPI tmp, 0x02
+	BRNE wait_seven_bytes_loop*/
 
 	RET
 
 send_byte:
 	OUT UDR, arg
-	RCALL delay_some_ms
+	waiting_loop:
+	SBIS UCSRA, TXC
+	RJMP waiting_loop
 	RET
 
 TIMER_INTERRUPT:
+	MOV tmp, second_one
+	COM tmp
+	;OUT PORTB, tmp
 	INC second_one ; A second has passed
 	CP second_one, ten_compare
 	BRNE END_OF_INTERRUPT
 	CLR second_one	; Set second_one to zero again
 	INC second_ten ; Ten seconds have passed
-	CP second_ten, seven_compare
+	CP second_ten, six_compare
 	BRNE END_OF_INTERRUPT
 	CLR second_ten	; Set second_ten to zero again
 	INC minute_one ; A minute has passed
@@ -139,7 +168,7 @@ TIMER_INTERRUPT:
 	BRNE END_OF_INTERRUPT
 	CLR minute_one	; Set minute_one to zero again
 	INC minute_ten ; Ten minutes have passed
-	CP minute_ten, seven_compare
+	CP minute_ten, six_compare
 	BRNE END_OF_INTERRUPT
 	CLR minute_ten	; Set minute_ten to zero again
 	INC hour_one ; An hour has passed
@@ -199,85 +228,10 @@ INIT_TIMER:
 	; zet prescaler op 256 & zet timer in CTC - mode
 	ldi tmp, (1 << CS12) | (1 << WGM12)
 	out TCCR1B, tmp
-	; enable interrupt
-	ldi tmp, (1 << OCIE1A)
+	LDI tmp, (1 << OCIE1A)
 	out TIMSK, tmp
 	sei ; enable alle interrupts
 	RET
-
-//LCD stuff
-init_lcd:
-	rcall init_4bitmode
-	ldi arg, 0x28		; 0010 1000 2 lines, 5x8 font, 4-bit mode see p 24/25 datasheet
-	rcall send_ins
-	ldi arg, 0x0E		; 0000 1110 display on, cursor on, no blinking see p 24/25 datasheet
-	rcall send_ins
-	ldi arg, 0x01		; 0000 0001 clear display, set cursor home, adres counter = 0
-	rcall send_ins
-	ldi arg, 0x06		; 0000 0110 auto-increment cursor
-	rcall send_ins
-	ret
-
-init_4bitmode:
-	ldi arg, 0x30
-	rcall clock_in
-	rcall delay_some_ms
-	ldi arg, 0x30
-	rcall clock_in
-	rcall delay_some_ms
-	ldi arg, 0x30
-	rcall clock_in
-	rcall delay_some_ms
-	ldi arg, 0x20
-	rcall clock_in
-	rcall delay_some_ms
-	ret
-
-send_ins:
-	push arg
-	; first 4 higher bits
-	andi arg, 0xf0
-	rcall clock_in
-	; then 4 lower bits
-	pop arg
-	swap arg
-	andi arg, 0xf0
-	rcall clock_in
-	rcall delay_some_ms
-	ret
-
-send_str:
-	LPM arg, Z+
-	CPI arg, 0xFF
-	BREQ send_str_end
-	RCALL show_char
-	RJMP send_str
-	send_str_end:
-		RET
-
-show_char:
-	push arg
-	; first 4 higher bits
-	andi arg, 0xf0
-	ORI arg, 0b00001000	; Set the RS bit high
-	rcall clock_in
-	; then 4 lower bits
-	pop arg
-	swap arg
-	andi arg, 0xf0
-	ORI arg, 0b00001000	; Set the RS bit high
-	rcall clock_in
-	rcall delay_some_ms
-	ret
-
-clock_in:
-	OUT LCD, arg
-	ORI arg, 0b00000100
-	out LCD, arg
-	ANDI arg, 0b11111011
-	out LCD, arg
-	rcall delay_some_ms
-	ret
 
 ; 65000 steps & CPU 11 Mhz gives delay of appr. 6 ms
 delay_some_ms:
