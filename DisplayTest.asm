@@ -43,8 +43,8 @@ init:
 	LDI tmp, 0x00				; Define the value for the output
 	OUT button_setup, tmp		; Define the buttons as input
 
-	RCALL INIT_RS232 ; Initialize the connection with the PC
-	RCALL INIT_TIMER ; Initialize the timer interrupt
+	;RCALL INIT_RS232 ; Initialize the connection with the PC
+	;RCALL INIT_TIMER ; Initialize the timer interrupt
 
 	; Initialize the compare registers
 	LDI tmp, 10
@@ -82,8 +82,8 @@ init:
 	LDI tmp, 0x00
 	OUT PORTB, tmp*/
 
-	LDI tmp, 0x81
-	OUT UDR, tmp
+	LDI tmp, 0x00
+	OUT PORTB, tmp
 
 	RJMP main
 
@@ -165,7 +165,7 @@ send_byte:
 TIMER_INTERRUPT:
 	MOV tmp, second_one
 	COM tmp
-	;OUT PORTB, tmp
+	OUT PORTB, tmp
 	INC second_one ; A second has passed
 	CP second_one, ten_compare
 	BRNE END_OF_INTERRUPT
