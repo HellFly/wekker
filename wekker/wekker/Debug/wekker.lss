@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.52  E:\Documents\Clock\wekker\wekker\wekker.asm Fri Apr 04 14:27:34 2014
+AVRASM ver. 2.1.52  E:\Documents\Clock\wekker\wekker\wekker.asm Tue Apr 08 12:08:24 2014
 
 [builtin](2): Including file 'D:\Atmel Toolchain\AVR Assembler\Native\2.1.39.1005\avrassembler\Include\m32def.inc'
 E:\Documents\Clock\wekker\wekker\wekker.asm(1): Including file 'D:\Atmel Toolchain\AVR Assembler\Native\2.1.39.1005\avrassembler\Include\m32def.inc'
@@ -864,6 +864,11 @@ E:\Documents\Clock\wekker\wekker\wekker.asm(1): Including file 'D:\Atmel Toolcha
                  #endif  /* _M32DEF_INC_ */
                  
                  
+                 	; Define some constants
+                 	.equ increment = 0b11111110
+                 	.equ continue = 0b11111101
+                 	.equ button = PINA			; Define the input buttons
+                 
                  	; Registers for the counters for the time
                  	.def hour_ten = R2
                  	.def hour_one = R3
@@ -882,182 +887,191 @@ E:\Documents\Clock\wekker\wekker\wekker.asm(1): Including file 'D:\Atmel Toolcha
                  	.def two_compare = R14
                  	.def four_compare = R15
                  
-                 	.def tmp = R16
-                 	.def arg = R17
-                 	.def counter1 = r18
-                 	.def counter2 = r19
-                 
-                 	.equ button = PINA			; Define the input buttons
-                 	.equ button_setup = DDRA
+                 	.def hud = R16 ; Register to save the HUD information
+                 	.def tmp = R17 ; Register for temporary values
+                 	.def arg = R18 ; Register for arguments for other subroutines
+                 	.def mode = R19 ; Register to check which mode to use in the timer interrupt (flicker, or increment)
+                 					; 0th bit will determine flickering in general 
+                 					; (if zero, nothing flickers, if one, flickering is possible)
+                 					; 1th bit will determine flickering of the alarm
+                 					; 2th bit will determine flickering of the seconds
+                 					; 3th bit will determine flickering of the minutes
+                 					; 4th bit will determine flickering of the hours
+                 	.def interrupt_counter = R20 ; A counter to increment every interrupt. If 1, increment time and clear it.
                  
 000000 c00e      	RJMP init
                  	
                  	.org OC1Aaddr
-00000e c04c      	RJMP TIMER_INTERRUPT ; adres ISR (Timer1 Output Compare Match)		
+00000e c06a      	RJMP TIMER_INTERRUPT ; adres ISR (Timer1 output Compare Match)		
                  
                  init:
                  	; init stackpointer
-00000f e50f      	LDI tmp, LOW(RAMEND)
-000010 bf0d       	OUT SPL, tmp
-000011 e008       	LDI tmp, HIGH(RAMEND)
-000012 bf0e       	OUT SPH, tmp
-                 
-000013 e000      	LDI tmp, 0x00				; Define the value for the output
-000014 bb0a      	OUT button_setup, tmp		; Define the buttons as input
-                 
-000015 d065      	RCALL INIT_RS232 ; Initialize the connection with the PC
-000016 d06d      	RCALL INIT_TIMER ; Initialize the timer interrupt
+00000f e51f      	LDI tmp, LOW(RAMEND)
+000010 bf1d       	OUT SPL, tmp
+000011 e018       	LDI tmp, HIGH(RAMEND)
+000012 bf1e       	OUT SPH, tmp
                  
                  	; Initialize the compare registers
-000017 e00a      	LDI tmp, 10
-000018 2ec0      	MOV ten_compare, tmp
-000019 e006      	LDI tmp, 6
-00001a 2ed0      	MOV six_compare, tmp
-00001b e002      	LDI tmp, 2
-00001c 2ee0      	MOV two_compare, tmp
-00001d e004      	LDI tmp, 4
-00001e 2ef0      	MOV four_compare, tmp
+000013 e01a      	LDI tmp, 10
+000014 2ec1      	MOV ten_compare, tmp
+000015 e016      	LDI tmp, 6
+000016 2ed1      	MOV six_compare, tmp
+000017 e012      	LDI tmp, 2
+000018 2ee1      	MOV two_compare, tmp
+000019 e014      	LDI tmp, 4
+00001a 2ef1      	MOV four_compare, tmp
                  
                  	; Make sure the registers are clear
-00001f 2477      	CLR second_one
-000020 2466      	CLR second_ten
-000021 2455      	CLR minute_one
-000022 2444      	CLR minute_ten
-000023 2433      	CLR hour_one
-000024 2422      	CLR hour_ten
-000025 24bb      	CLR alarm_minute_one
-000026 24aa      	CLR alarm_minute_ten
-000027 2499      	CLR alarm_hour_one
-000028 2488      	CLR alarm_hour_ten
+00001b 2477      	CLR second_one
+00001c 2466      	CLR second_ten
+00001d 2455      	CLR minute_one
+00001e 2444      	CLR minute_ten
+00001f 2433      	CLR hour_one
+000020 2422      	CLR hour_ten
+000021 24bb      	CLR alarm_minute_one
+000022 24aa      	CLR alarm_minute_ten
+000023 2499      	CLR alarm_hour_one
+000024 2488      	CLR alarm_hour_ten
+000025 2744      	CLR interrupt_counter
                  
-000029 ef0f      	LDI tmp, 0xFF
-00002a bb07      	OUT DDRB, tmp
-00002b bb08      	OUT PORTB, tmp
+000026 d05a      	RCALL INIT_RS232 ; Initialize the connection with the PC
+000027 d06c      	RCALL INIT_BUTTONS ; Initialize the buttons
+                 	; Clear the display
+000028 e820      	LDI arg, 0x80
+000029 d02d      	RCALL send_byte
                  
-                 	/*LDI arg, 0x00
-                 	RCALL send_byte
-                 	test_loop:
-                 	IN tmp, UDR
-                 	CPI tmp, 0x02
-                 	BRNE test_loop
-                 	LDI tmp, 0x00
-                 	OUT PORTB, tmp*/
+00002a e006      	LDI hud, 0b00000110
+00002b e030      	LDI mode, 0
                  
-00002c e801      	LDI tmp, 0x81
-00002d b90c      	OUT UDR, tmp
-                 
-00002e c000      	RJMP main
+                 	; Show the time (zero everything)
+00002c d003      	RCALL send_time
+00002d d05c      	RCALL INIT_TIMER ; Initialize the timer interrupt
                  
                  main:
-                 	;RCALL TIMER_INTERRUPT
+00002e cfff      	RJMP main
                  
-00002f cfff      	RJMP main
+                 
+                 ; Subroutine used to let the user set the time
+                 SET_TIME:
+                 
+00002f 9508      	RET
                  
                  send_time:
-000030 e2ea      	LDI ZL, low(numbers*2)
+                 	; Prepare the hour_ten
+000030 e2ee      	LDI ZL, low(numbers*2)
 000031 e0f1      	LDI ZH, high(numbers*2)
-000032 2d02      	MOV tmp, hour_ten
-000033 0fe0      	ADD ZL, tmp
-000034 9114      	LPM arg, Z
+000032 2d12      	MOV tmp, hour_ten ; Grab it from the program memory using Z
+000033 0fe1      	ADD ZL, tmp
+000034 9124      	LPM arg, Z
 000035 d021      	RCALL send_byte
-                 	
-000036 e2ea      	LDI ZL, low(numbers*2)
+                 	; Prepare the hour_one
+000036 e2ee      	LDI ZL, low(numbers*2)
 000037 e0f1      	LDI ZH, high(numbers*2)
-000038 2d03      	MOV tmp, hour_one
-000039 0fe0      	ADD ZL, tmp
-00003a 9114      	LPM arg, Z
+000038 2d13      	MOV tmp, hour_one ; Grab it from the program memory using Z
+000039 0fe1      	ADD ZL, tmp
+00003a 9124      	LPM arg, Z
 00003b d01b      	RCALL send_byte
-                 
-00003c e2ea      	LDI ZL, low(numbers*2)
+                 	; Prepare the minute_ten
+00003c e2ee      	LDI ZL, low(numbers*2)
 00003d e0f1      	LDI ZH, high(numbers*2)
-00003e 2d04      	MOV tmp, minute_ten
-00003f 0fe0      	ADD ZL, tmp
-000040 9114      	LPM arg, Z
+00003e 2d14      	MOV tmp, minute_ten ; Grab it from the program memory using Z
+00003f 0fe1      	ADD ZL, tmp
+000040 9124      	LPM arg, Z
 000041 d015      	RCALL send_byte
-                 
-000042 e2ea      	LDI ZL, low(numbers*2)
+                 	; Prepare the minute_one
+000042 e2ee      	LDI ZL, low(numbers*2)
 000043 e0f1      	LDI ZH, high(numbers*2)
-000044 2d05      	MOV tmp, minute_one
-000045 0fe0      	ADD ZL, tmp
-000046 9114      	LPM arg, Z
+000044 2d15      	MOV tmp, minute_one ; Grab it from the program memory using Z
+000045 0fe1      	ADD ZL, tmp
+000046 9124      	LPM arg, Z
 000047 d00f      	RCALL send_byte
-                 
-000048 e2ea      	LDI ZL, low(numbers*2)
+                 	; Prepare the second_ten
+000048 e2ee      	LDI ZL, low(numbers*2)
 000049 e0f1      	LDI ZH, high(numbers*2)
-00004a 2d06      	MOV tmp, second_ten
-00004b 0fe0      	ADD ZL, tmp
-00004c 9114      	LPM arg, Z
+00004a 2d16      	MOV tmp, second_ten ; Grab it from the program memory using Z
+00004b 0fe1      	ADD ZL, tmp
+00004c 9124      	LPM arg, Z
 00004d d009      	RCALL send_byte
-                 
-00004e e2ea      	LDI ZL, low(numbers*2)
+                 	; Prepare the second_one
+00004e e2ee      	LDI ZL, low(numbers*2)
 00004f e0f1      	LDI ZH, high(numbers*2)
-000050 2d07      	MOV tmp, second_one
-000051 0fe0      	ADD ZL, tmp
-000052 9114      	LPM arg, Z
+000050 2d17      	MOV tmp, second_one ; Grab it from the program memory using Z
+000051 0fe1      	ADD ZL, tmp
+000052 9124      	LPM arg, Z
 000053 d003      	RCALL send_byte
-                 
-000054 e012      	LDI arg, 0b00000010		; Only the last colon is on
+                 	; Prepare the HUD information
+000054 2f20      	MOV arg, hud		; Send information
 000055 d001      	RCALL send_byte
-                 
-                 	/*wait_seven_bytes_loop:
-                 	IN tmp, UDR
-                 	COM R20
-                 	OUT PORTB, R20
-                 	CPI tmp, 0x02
-                 	BRNE wait_seven_bytes_loop*/
-                 
 000056 9508      	RET
                  
-                 send_byte:
-000057 b91c      	OUT UDR, arg
+                 
+                 ; Subroutine to send one byte
+                 send_byte:	
+000057 b92c      	OUT UDR, arg ; Sent the byte saved in the register arg
+                 	; Wait until it is confirmed that the byte has been send.
                  	waiting_loop:
-000058 9b5e      	SBIS UCSRA, TXC
+000058 9b5d      	SBIS UCSRA, UDRE
 000059 cffe      	RJMP waiting_loop
-00005a 9508      	RET
+00005a 9508      	RET ; Return from this subroutine
                  
-                 TIMER_INTERRUPT:
-00005b 2d07      	MOV tmp, second_one
-00005c 9500      	COM tmp
-                 	;OUT PORTB, tmp
-00005d 9473      	INC second_one ; A second has passed
-00005e 147c      	CP second_one, ten_compare
-00005f f4c9      	BRNE END_OF_INTERRUPT
-000060 2477      	CLR second_one	; Set second_one to zero again
-000061 9463      	INC second_ten ; Ten seconds have passed
-000062 146d      	CP second_ten, six_compare
-000063 f4a9      	BRNE END_OF_INTERRUPT
-000064 2466      	CLR second_ten	; Set second_ten to zero again
-000065 9453      	INC minute_one ; A minute has passed
-000066 145c      	CP minute_one, ten_compare
-000067 f489      	BRNE END_OF_INTERRUPT
-000068 2455      	CLR minute_one	; Set minute_one to zero again
-000069 9443      	INC minute_ten ; Ten minutes have passed
-00006a 144d      	CP minute_ten, six_compare
-00006b f469      	BRNE END_OF_INTERRUPT
-00006c 2444      	CLR minute_ten	; Set minute_ten to zero again
-00006d 9433      	INC hour_one ; An hour has passed
+                 ; Subroutine. Will increment the counters and use the send_time subroutine to update
+                 ; the emulated display
+                 INCREMENT_TIME:
+00005b 9473      INC second_one ; A second has passed
+00005c 147c      	CP second_one, ten_compare
+00005d f4c9      	BRNE END_OF_INCREMENT ; If seconds_one has not reached ten, go to the end.
+00005e 2477      	CLR second_one	; Set second_one to zero again
+00005f 9463      	INC second_ten ; Ten seconds have passed
+000060 146d      	CP second_ten, six_compare
+000061 f4a9      	BRNE END_OF_INCREMENT ; If seconds_ten has not reached six, go to the end.
+000062 2466      	CLR second_ten	; Set second_ten to zero again
+000063 9453      	INC minute_one ; A minute has passed
+000064 145c      	CP minute_one, ten_compare
+000065 f489      	BRNE END_OF_INCREMENT ; If minutes_one has not reached ten, go to the end.
+000066 2455      	CLR minute_one	; Set minute_one to zero again
+000067 9443      	INC minute_ten ; Ten minutes have passed
+000068 144d      	CP minute_ten, six_compare
+000069 f469      	BRNE END_OF_INCREMENT ; If minutes_ten has not reached 
+00006a 2444      	CLR minute_ten	; Set minute_ten to zero again
+00006b 9433      	INC hour_one ; An hour has passed
+00006c 143c      	CP hour_one, ten_compare 
+00006d f419      	BRNE END_OF_DAY_TEST ; If hours have not reached ten, test whether the end of day has been reached
+00006e 2433      	CLR hour_one	; Set hour_one to zero again
+00006f 9423      	INC hour_ten	; Ten hours have passed
+000070 c006      	RJMP END_OF_INCREMENT	; End
+                 
                  	; Check whether 24 hours has been reached
-00006e 143f      	CP hour_one, four_compare
-00006f f411      	BRNE CONTINUE
-000070 142e      	CP hour_ten, two_compare
-000071 f029      	BREQ END_OF_DAY_REACHED
-                 	; 24 not reached, hour_one can increase, continue
-                 	CONTINUE:
-000072 143c      	CP hour_one, ten_compare
-000073 f429      	BRNE END_OF_INTERRUPT
-000074 2433      	CLR hour_one	; Set hour_one to zero again
-000075 9423      	INC hour_ten	; Ten hours have passed
-000076 c002      	RJMP END_OF_INTERRUPT	; End
-                 
-                 	; 24 hours reached, set it to zero
-                 	END_OF_DAY_REACHED:
-000077 2422      	CLR hour_ten
-000078 2433      	CLR hour_one
+                 	END_OF_DAY_TEST:
+000071 143f      	CP hour_one, four_compare ; Check whether hour_one is four
+000072 f421      	BRNE END_OF_INCREMENT ; If no, 24 has certainly not been reached, go to the end
+000073 142e      	CP hour_ten, two_compare ; If gotten here, hour_one is four. Check if hour_ten is two
+000074 f411      	BRNE END_OF_INCREMENT ; If hour_ten is not two, 24 has not been reached
+000075 2433      	CLR hour_one ; 24 has been reached. Clear hour_ten and hour_one
+000076 2422      	CLR hour_ten
                  
                  	; Jump here to end the interrupt when needed
-                 	END_OF_INTERRUPT:
-000079 dfb6      	RCALL send_time
-00007a 9518      	RETI
+                 	END_OF_INCREMENT:
+000077 dfb8      	RCALL send_time
+000078 9508      	RET
+                 
+                 ; ISR for the timer. 
+                 TIMER_INTERRUPT:
+                 	
+000079 fd31      	SBRC mode, 1
+00007a c005      	RJMP END_OF_TIMER_INTERRUPT
+                 
+                 	;TRY_TO_INCREMENT:
+00007b 9543      	INC interrupt_counter
+00007c 3042      	CPI interrupt_counter, 2
+00007d f411      	BRNE END_OF_TIMER_INTERRUPT
+00007e 2744      	CLR interrupt_counter
+00007f dfdb      	RCALL INCREMENT_TIME
+                 
+                 	END_OF_TIMER_INTERRUPT:
+000080 9518      	RETI
+                 
+                 
+                 ; Initialization subroutines
                  
                  ; Initialize the connection with the PC
                  INIT_RS232:
@@ -1065,56 +1079,54 @@ E:\Documents\Clock\wekker\wekker\wekker.asm(1): Including file 'D:\Atmel Toolcha
                  	; F_OSC = 11.0592 MHz & baud rate = 19200
                  	; to do a 16-bit write, the high byte must be written before the low byte !
                  	; for a 16-bit read, the low byte must be read before the high byte !
-00007b e000      	ldi tmp, high(35)
-00007c bd00      	out UBRRH, tmp
-00007d e203      	ldi tmp, low(35) ; 19200 baud
-00007e b909      	out UBRRL, tmp
+000081 e010      	LDI tmp, high(35)
+000082 bd10      	OUT UBRRH, tmp
+000083 e213      	LDI tmp, low(35) ; 19200 baud
+000084 b919      	OUT UBRRL, tmp
                  
                  	; set frame format : asynchronous, parity disabled, 8 data bits, 1 stop bit
-00007f e806      	ldi tmp, (1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0)
-000080 bd00      	out UCSRC, tmp
+000085 e816      	LDI tmp, (1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0)
+000086 bd10      	OUT UCSRC, tmp
                  	; enable receiver & transmitter
-000081 e108      	ldi tmp, (1 << RXEN) | (1 << TXEN)
-000082 b90a      	out UCSRB, tmp
-000083 9508      	RET
+000087 e118      	LDI tmp, (1 << RXEN) | (1 << TXEN)
+000088 b91a      	OUT UCSRB, tmp
+000089 9508      	RET
+                 
                  
                  ; Initialize the timer
                  INIT_TIMER:
-                 	; init Output Compare Register
+                 	; init output Compare Register
                  	; f kristal = 11059200 en 1 sec = (256/11059200) * 43200
                  	; to do a 16 - bit write, the high byte must be written before the low byte !
                  	; for a 16 - bit read, the low byte must be read before the high byte !
                  	; (p 89 datasheet)
-000084 ea08      	ldi tmp, high(43200)
-000085 bd0b      	out OCR1AH, tmp
-000086 ec00      	ldi tmp, low(43200)
-000087 bd0a      	out OCR1AL, tmp
+00008a e514      	LDI tmp, high(21600)
+00008b bd1b      	OUT OCR1AH, tmp
+00008c e610      	LDI tmp, low(21600)
+00008d bd1a      	OUT OCR1AL, tmp
                  	; zet prescaler op 256 & zet timer in CTC - mode
-000088 e00c      	ldi tmp, (1 << CS12) | (1 << WGM12)
-000089 bd0e      	out TCCR1B, tmp
-00008a e100      	LDI tmp, (1 << OCIE1A)
-00008b bf09      	out TIMSK, tmp
-00008c 9478      	sei ; enable alle interrupts
-00008d 9508      	RET
+00008e e01c      	LDI tmp, (1 << CS12) | (1 << WGM12)
+00008f bd1e      	OUT TCCR1B, tmp
+000090 e110      	LDI tmp, (1 << OCIE1A)
+000091 bf19      	OUT TIMSK, tmp
+000092 9478      	SEI ; enable alle interrupts
+000093 9508      	RET
                  
-                 ; 65000 steps & CPU 11 Mhz gives delay of appr. 6 ms
-                 delay_some_ms:
-00008e e02c      	ldi counter1, 12
-                 delay_1:
-00008f 2733      	clr counter2
-                 delay_2:
-000090 953a      	dec counter2
-000091 f7f1      	brne delay_2
-000092 952a      	dec counter1
-000093 f7d9      	brne delay_1
-000094 9508      	ret
+                 ; Subroutine to initalize the buttons.
+                 INIT_BUTTONS:
+000094 ef1c      	LDI tmp, 0b11111100 ; Only SW0 and SW1 are accepted as input
+000095 bb1a      	OUT DDRA, tmp
+000096 9508      	RET
                  
+                 
+                 ; These are the bytes needed to show a certain number on the display. These numbers are shown below.
+                 ; In order to grab these bytes, use numbers as the adres for Z, + the number you need.
                  numbers:
-000095 2477
-000096 6d5d
-000097 6a2e
-000098 257b
-000099 6f7f      	.db 0b01110111, 0b00100100, 0b01011101, 0b01101101, 0b00101110, 0b01101010, 0b01111011, 0b00100101, 0b01111111, 0b01101111
+000097 2477
+000098 6d5d
+000099 6b2e
+00009a 257b
+00009b 6f7f      	.db 0b01110111, 0b00100100, 0b01011101, 0b01101101, 0b00101110, 0b01101011, 0b01111011, 0b00100101, 0b01111111, 0b01101111
                  ;		0			1			2			3			4			5			6			7			8			9
 
 
@@ -1133,39 +1145,39 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega32" register use summary:
-r0 :   0 r1 :   0 r2 :   5 r3 :   7 r4 :   5 r5 :   5 r6 :   5 r7 :   6 
+r0 :   0 r1 :   0 r2 :   5 r3 :   7 r4 :   5 r5 :   5 r6 :   5 r7 :   5 
 r8 :   1 r9 :   1 r10:   1 r11:   1 r12:   4 r13:   3 r14:   2 r15:   2 
-r16:  49 r17:   8 r18:   2 r19:   2 r20:   0 r21:   0 r22:   0 r23:   0 
+r16:   2 r17:  42 r18:   9 r19:   2 r20:   4 r21:   0 r22:   0 r23:   0 
 r24:   0 r25:   0 r26:   0 r27:   0 r28:   0 r29:   0 r30:  12 r31:   6 
 x  :   0 y  :   0 z  :   6 
-Registers used: 21 out of 35 (60.0%)
+Registers used: 22 out of 35 (62.9%)
 
 "ATmega32" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   0 add   :   6 adiw  :   0 and   :   0 
 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :   1 brge  :   0 brhc  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :   0 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
 brne  :   8 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
 brvs  :   0 bset  :   0 bst   :   0 call  :   0 cbi   :   0 cbr   :   0 
-clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  18 cls   :   0 
-clt   :   0 clv   :   0 clz   :   0 com   :   1 cp    :   7 cpc   :   0 
-cpi   :   0 cpse  :   0 dec   :   2 eor   :   0 fmul  :   0 fmuls :   0 
-fmulsu:   0 icall :   0 ijmp  :   0 in    :   0 inc   :   6 jmp   :   0 
-ld    :   0 ldd   :   0 ldi   :  31 lds   :   0 lpm   :  12 lsl   :   0 
+clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  19 cls   :   0 
+clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   7 cpc   :   0 
+cpi   :   1 cpse  :   0 dec   :   0 eor   :   0 fmul  :   0 fmuls :   0 
+fmulsu:   0 icall :   0 ijmp  :   0 in    :   0 inc   :   7 jmp   :   0 
+ld    :   0 ldd   :   0 ldi   :  30 lds   :   0 lpm   :  12 lsl   :   0 
 lsr   :   0 mov   :  11 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
-neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :  15 pop   :   0 
-push  :   0 rcall :  10 ret   :   5 reti  :   1 rjmp  :   6 rol   :   0 
+neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :  12 pop   :   0 
+push  :   0 rcall :  14 ret   :   7 reti  :   1 rjmp  :   6 rol   :   0 
 ror   :   0 sbc   :   0 sbci  :   0 sbi   :   0 sbic  :   0 sbis  :   1 
-sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 
+sbiw  :   0 sbr   :   0 sbrc  :   1 sbrs  :   0 sec   :   0 seh   :   0 
 sei   :   1 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
 sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :   0 
 sub   :   0 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 18 out of 113 (15.9%)
+Instructions used: 17 out of 113 (15.0%)
 
 "ATmega32" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000134    272     10    282   32768   0.9%
+[.cseg] 0x000000 0x000138    276     10    286   32768   0.9%
 [.dseg] 0x000060 0x000060      0      0      0    2048   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 

@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.52  E:\Documents\Clock\wekker\wekker\wekker.asm Fri Apr 04 14:27:34 2014
+AVRASM ver. 2.1.52  E:\Documents\Clock\wekker\wekker\wekker.asm Tue Apr 08 12:08:24 2014
 
 
 EQU  SIGNATURE_000 0000001e
@@ -568,6 +568,9 @@ EQU  ACIaddr      00000024
 EQU  TWIaddr      00000026
 EQU  SPMRaddr     00000028
 EQU  INT_VECTORS_SIZE 0000002a
+EQU  increment    000000fe
+EQU  continue     000000fd
+EQU  button       00000019
 DEF  hour_ten     r2
 DEF  hour_one     r3
 DEF  minute_ten   r4
@@ -582,24 +585,23 @@ DEF  ten_compare  r12
 DEF  six_compare  r13
 DEF  two_compare  r14
 DEF  four_compare r15
-DEF  tmp          r16
-DEF  arg          r17
-DEF  counter1     r18
-DEF  counter2     r19
-EQU  button       00000019
-EQU  button_setup 0000001a
+DEF  hud          r16
+DEF  tmp          r17
+DEF  arg          r18
+DEF  mode         r19
+DEF  interrupt_counter r20
 CSEG init         0000000f
-CSEG TIMER_INTERRUPT 0000005b
-CSEG INIT_RS232   0000007b
-CSEG INIT_TIMER   00000084
-CSEG main         0000002f
-CSEG send_time    00000030
-CSEG numbers      00000095
+CSEG TIMER_INTERRUPT 00000079
+CSEG INIT_RS232   00000081
+CSEG INIT_BUTTONS 00000094
 CSEG send_byte    00000057
+CSEG send_time    00000030
+CSEG INIT_TIMER   0000008a
+CSEG main         0000002e
+CSEG SET_TIME     0000002f
+CSEG numbers      00000097
 CSEG waiting_loop 00000058
-CSEG END_OF_INTERRUPT 00000079
-CSEG CONTINUE     00000072
-CSEG END_OF_DAY_REACHED 00000077
-CSEG delay_some_ms 0000008e
-CSEG delay_1      0000008f
-CSEG delay_2      00000090
+CSEG INCREMENT_TIME 0000005b
+CSEG END_OF_INCREMENT 00000077
+CSEG END_OF_DAY_TEST 00000071
+CSEG END_OF_TIMER_INTERRUPT 00000080
