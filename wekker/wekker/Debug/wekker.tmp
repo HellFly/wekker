@@ -1,17 +1,17 @@
 <ASSEMBLER_INFO>
  <VERSION>2.1.52</VERSION>
  <DEVICE>"ATmega32"</DEVICE>
- <WORKING_DIR>E:\Documents\Clock\wekker\wekker\Debug</WORKING_DIR>
+ <WORKING_DIR>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\Debug</WORKING_DIR>
  <INCLUDE_PATH>
-  <DIR>D:\Atmel Toolchain\AVR Assembler\Native\2.1.39.1005\avrassembler\Include</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.39.1005\avrassembler\Include</DIR>
   <DIR></DIR>
  </INCLUDE_PATH>
- <SOURCE_FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</SOURCE_FILE>
+ <SOURCE_FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</SOURCE_FILE>
  <INCLUDED_FILES>
-  <FILE>D:\Atmel Toolchain\AVR Assembler\Native\2.1.39.1005\avrassembler\Include\m32def.inc</FILE>
+  <FILE>C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.39.1005\avrassembler\Include\m32def.inc</FILE>
  </INCLUDED_FILES>
  <OBJECT_FILES>
-  <FILE>E:\Documents\Clock\wekker\wekker\Debug/wekker.obj</FILE>
+  <FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\Debug/wekker.obj</FILE>
  </OBJECT_FILES>
  <HEX_FILES>
   <FILE>wekker.hex</FILE>
@@ -21,20 +21,20 @@
   <FILE>wekker.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <init><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>43</LINE></init>
-  <TIMER_INTERRUPT><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>194</LINE></TIMER_INTERRUPT>
-  <INIT_RS232><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>213</LINE></INIT_RS232>
-  <INIT_BUTTONS><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>252</LINE></INIT_BUTTONS>
-  <send_byte><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>145</LINE></send_byte>
-  <send_time><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>95</LINE></send_time>
-  <INIT_TIMER><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>233</LINE></INIT_TIMER>
-  <main><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>86</LINE></main>
-  <SET_TIME><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>91</LINE></SET_TIME>
-  <numbers><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>260</LINE></numbers>
-  <waiting_loop><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>148</LINE></waiting_loop>
-  <INCREMENT_TIME><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>155</LINE></INCREMENT_TIME>
-  <END_OF_INCREMENT><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>189</LINE></END_OF_INCREMENT>
-  <END_OF_DAY_TEST><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>180</LINE></END_OF_DAY_TEST>
-  <END_OF_TIMER_INTERRUPT><FILE>E:\Documents\Clock\wekker\wekker\wekker.asm</FILE><LINE>206</LINE></END_OF_TIMER_INTERRUPT>
+  <init><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>43</LINE></init>
+  <TIMER_INTERRUPT><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>194</LINE></TIMER_INTERRUPT>
+  <INIT_RS232><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>213</LINE></INIT_RS232>
+  <INIT_BUTTONS><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>252</LINE></INIT_BUTTONS>
+  <send_byte><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>145</LINE></send_byte>
+  <send_time><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>95</LINE></send_time>
+  <INIT_TIMER><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>233</LINE></INIT_TIMER>
+  <main><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>86</LINE></main>
+  <SET_TIME><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>91</LINE></SET_TIME>
+  <numbers><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>260</LINE></numbers>
+  <waiting_loop><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>148</LINE></waiting_loop>
+  <INCREMENT_TIME><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>155</LINE></INCREMENT_TIME>
+  <END_OF_INCREMENT><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>189</LINE></END_OF_INCREMENT>
+  <END_OF_DAY_TEST><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>180</LINE></END_OF_DAY_TEST>
+  <END_OF_TIMER_INTERRUPT><FILE>C:\Users\Joshua\Documents\GitHub\wekker\wekker\wekker\wekker.asm</FILE><LINE>206</LINE></END_OF_TIMER_INTERRUPT>
  </LABELS>
 </ASSEMBLER_INFO>
